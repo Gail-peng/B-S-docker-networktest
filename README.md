@@ -19,3 +19,58 @@
 1.后端配置跨域
 
 2.在 Docker 中添加 Nginx 服务，作为前端和后端的中间层，统一请求域名 / 端口，避免跨域。
+
+## 关于Nginx的配置
+
+在 Nginx 配置中，路径匹配规则（如/back和/back/）和代理目标地址（如http://backend:5000和http://backend:5000/）的末尾斜杠（/）会影响请求路径的处理方式。以下是详细区别和示例：
+
+一、location /back vs location /back/
+
+1. location /back（不带末尾斜杠）
+   
+匹配规则：
+匹配所有以 /back 开头的路径，无论其后是否有斜杠。
+示例匹配：
+/back
+/back/
+/back/api
+/back/test/123
+
+2. location /back/（带末尾斜杠）
+   
+匹配规则：
+严格匹配以 /back/ 开头的路径，必须包含斜杠。
+示例匹配：
+/back/
+/back/api
+/back/test/123
+不匹配：
+/back（缺少末尾斜杠）
+
+proxy_pass http://backend:5000 vs proxy_pass http://backend:5000/
+
+1. proxy_pass http://backend:5000（不带末尾斜杠）
+
+路径处理：
+保留原请求路径的完整前缀。
+示例：
+nginx
+location /back {
+    proxy_pass http://backend:5000;
+}
+
+请求 /back/api/users → 转发到 http://backend:5000/back/api/users
+（保留 /back 前缀）
+
+2. proxy_pass http://backend:5000/（带末尾斜杠）
+
+路径处理：
+移除匹配的前缀部分，仅转发剩余路径。
+示例：
+nginx
+location /back {
+    proxy_pass http://backend:5000/;
+}
+
+请求 /back/api/users → 转发到 http://backend:5000/api/users
+（移除 /back 前缀）
