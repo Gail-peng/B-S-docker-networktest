@@ -2,18 +2,18 @@ version: '3'
 
 services:
   # 后端服务
-  backend:
+  test-back:
     build: ./backend
     networks:
       - app-network
 
   # 前端+Nginx服务
-  frontend:
+  test-front:
     build: ./frontend
     ports:
       - "85:80"  # 暴露端口
     depends_on:
-      - backend
+      - test-back
     networks:
       - app-network
 
