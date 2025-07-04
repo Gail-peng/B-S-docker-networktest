@@ -31,33 +31,43 @@
 匹配规则：
 匹配所有以 /back 开头的路径，无论其后是否有斜杠。
 示例匹配：
+
+```
 /back
 /back/
 /back/api
 /back/test/123
+```
 
 2. location /back/（带末尾斜杠）
    
 匹配规则：
 严格匹配以 /back/ 开头的路径，必须包含斜杠。
 示例匹配：
+
+```
 /back/
 /back/api
 /back/test/123
 不匹配：
 /back（缺少末尾斜杠）
+```
 
 proxy_pass http://backend:5000 vs proxy_pass http://backend:5000/
 
 1. proxy_pass http://backend:5000（不带末尾斜杠）
 
 路径处理：
+
 保留原请求路径的完整前缀。
 示例：
+
+```
 nginx
 location /back {
     proxy_pass http://backend:5000;
 }
+```
 
 请求 /back/api/users → 转发到 http://backend:5000/back/api/users
 （保留 /back 前缀）
@@ -67,10 +77,13 @@ location /back {
 路径处理：
 移除匹配的前缀部分，仅转发剩余路径。
 示例：
+
+```
 nginx
 location /back {
     proxy_pass http://backend:5000/;
 }
+```
 
 请求 /back/api/users → 转发到 http://backend:5000/api/users
 （移除 /back 前缀）
@@ -105,7 +118,7 @@ server {
 其中
 
 ## 1. listen 中监听的端口，此端口为前端服务在docker内的容器端口
-## 2. server_name 此项是配置监听的服务名称，填写docker compose中设置的对应的容器的名称即可
+## 2. server_name 此项是配置监听的服务名称，填写docker compose中设置的对应的前端服务的名称即可
 ## 3. 代理的通配URL，此处填写前端请求中代理的通配URL即可，即可将包含有相关的URL的请求转发到指定地址上
 ## 4. proxy_pass 填写代理的后端地址，使用服务名称和端口号即可
 
