@@ -74,3 +74,39 @@ location /back {
 
 请求 /back/api/users → 转发到 http://backend:5000/api/users
 （移除 /back 前缀）
+
+# 关于Nginx的配置
+
+```
+server {
+    listen 80;
+    server_name test-front;
+
+    # 前端静态文件
+    location / {
+        root /usr/share/nginx/html;
+        index index.html;
+        try_files $uri $uri/ /index.html;
+    }
+
+    # 后端API代理（关键：通过服务名访问后端）
+    location /back/ {
+        proxy_pass http://test-back:5000/;  # 直接使用后端服务名
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        
+        # 解决跨域问题
+        add_header Access-Control-Allow-Origin *;
+        add_header Access-Control-Allow-Methods 'GET, POST, PUT, DELETE, OPTIONS';
+        add_header Access-Control-Allow-Headers 'Origin, Content-Type, Accept, Authorization';
+    }
+}
+```
+其中
+
+## 1. listen 中监听的端口，此端口为前端服务在docker内的容器端口
+## 2. server_name 此项是配置监听的服务名称，填写docker compose中设置的对应的容器的名称即可
+## 3. 代理的通配URL，此处填写前端请求中代理的通配URL即可，即可将包含有相关的URL的请求转发到指定地址上
+## 4. proxy_pass 填写代理的后端地址，使用服务名称和端口号即可
+
+## 其他项目无需专门进行配置，一般跨域都会在后端中进行设置
